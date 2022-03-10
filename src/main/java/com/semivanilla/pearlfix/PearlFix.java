@@ -2,7 +2,9 @@ package com.semivanilla.pearlfix;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,28 +49,44 @@ public final class PearlFix extends JavaPlugin implements Listener {
                     }
                 }
                 event.getEntity().remove();
+                return;
             }
-            else {
-                Block[] blocks = {
-                        hit.getRelative(0, -1, 0),
-                        hit.getRelative(0, 1, 0),
-                        hit.getRelative(0, 0, -1),
-                        hit.getRelative(0, 0, 1),
-                        hit.getRelative(-1, 0, 0),
-                        hit.getRelative(1, 0, 0)
-                };
-                for (Block block : blocks) {
-                    Material type2 = block.getType();
-                    if (type2.name().toLowerCase().contains("door")) {
-                        event.setCancelled(true);
-                        if (event.getEntity().getShooter() != null && event.getEntity().getShooter() instanceof Player) {
-                            Player player = (Player) event.getEntity().getShooter();
-                            for (String message : messages) {
-                                player.sendMessage(miniMessage.deserialize(message));
-                            }
+            Block above = hit.getRelative(BlockFace.UP);
+            Block[] blocks0 = {
+                    above.getRelative(BlockFace.NORTH),
+                    above.getRelative(BlockFace.SOUTH),
+                    above.getRelative(BlockFace.EAST),
+                    above.getRelative(BlockFace.WEST),
+                    hit.getRelative(BlockFace.DOWN),
+                    hit.getRelative(BlockFace.UP),
+                    hit.getRelative(BlockFace.NORTH),
+                    hit.getRelative(BlockFace.SOUTH),
+                    hit.getRelative(BlockFace.EAST),
+                    hit.getRelative(BlockFace.WEST),
+                    hit.getRelative(BlockFace.NORTH_EAST),
+                    hit.getRelative(BlockFace.NORTH_WEST),
+                    hit.getRelative(BlockFace.SOUTH_EAST),
+                    hit.getRelative(BlockFace.SOUTH_WEST),
+                    hit.getRelative(BlockFace.NORTH_NORTH_EAST),
+                    hit.getRelative(BlockFace.NORTH_NORTH_WEST),
+                    hit.getRelative(BlockFace.SOUTH_SOUTH_EAST),
+                    hit.getRelative(BlockFace.SOUTH_SOUTH_WEST),
+                    hit.getRelative(BlockFace.EAST_NORTH_EAST),
+                    hit.getRelative(BlockFace.EAST_SOUTH_EAST),
+                    hit.getRelative(BlockFace.WEST_NORTH_WEST),
+                    hit.getRelative(BlockFace.WEST_SOUTH_WEST),
+            };
+            for (Block block : blocks0) {
+                if (block.getType().name().toLowerCase().contains("door")) {
+                    event.setCancelled(true);
+                    if (event.getEntity().getShooter() != null && event.getEntity().getShooter() instanceof Player) {
+                        Player player = (Player) event.getEntity().getShooter();
+                        for (String message : messages) {
+                            player.sendMessage(miniMessage.deserialize(message));
                         }
-                        event.getEntity().remove();
                     }
+                    event.getEntity().remove();
+                    return;
                 }
             }
         }
