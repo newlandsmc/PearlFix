@@ -1,0 +1,4 @@
+name: PearlFix
+version: '${project.version}'
+main: com.semivanilla.pearlfix.PearlFix
+api-version: 1.18
