@@ -1,2 +1,9 @@
 message:
-  - '<red>You cannot throw a pearl through a door!'
+  - '<red>You cannot throw a pearl through this block!'
+blocked_items:
+  - '.*_FENCE*.*'
+  - '.*GLASS_PANE'
+  - '.*_STAIRS'
+  - '.*DOOR'
+  - 'CHAINS'
+

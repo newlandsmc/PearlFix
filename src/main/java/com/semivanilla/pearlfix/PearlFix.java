@@ -2,7 +2,6 @@ package com.semivanilla.pearlfix;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
@@ -14,11 +13,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import static org.bukkit.Material.values;
 
 public final class PearlFix extends JavaPlugin implements Listener {
     private static List<String> messages = new ArrayList<>();
     private static final MiniMessage miniMessage = MiniMessage.miniMessage();
+
+    private static EnumSet<Material> blockedItems;
 
     @Override
     public void onEnable() {
@@ -30,9 +35,21 @@ public final class PearlFix extends JavaPlugin implements Listener {
         }
         getServer().getPluginManager().registerEvents(this, this);
         messages.clear();
-        messages.add("<red>You cannot throw a pearl through a door!");
+        for (String message : getConfig().getStringList("message")) {
+            messages.add(message);
+        }
+        List<Material> materials = new ArrayList<>();
+        for (String blockedItems : getConfig().getStringList("blocked_items")) {
+            Pattern pattern = Pattern.compile(blockedItems);
+            for (Material value : values()) {
+                if (pattern.matcher(value.name()).matches())
+                    materials.add(value);
+            }
+        }
+        blockedItems = EnumSet.copyOf(materials);
         //messages.addAll(getConfig().getStringList("messages"));
     }
+
 
     @EventHandler
     public void onPearlLand(ProjectileHitEvent event) {
@@ -77,7 +94,9 @@ public final class PearlFix extends JavaPlugin implements Listener {
                     hit.getRelative(BlockFace.WEST_SOUTH_WEST),
             };
             for (Block block : blocks0) {
-                if (block.getType().name().toLowerCase().contains("door")) {
+                if (block.isEmpty())
+                    continue;
+                if (blockedItems.contains(block.getType())) {
                     event.setCancelled(true);
                     if (event.getEntity().getShooter() != null && event.getEntity().getShooter() instanceof Player) {
                         Player player = (Player) event.getEntity().getShooter();
